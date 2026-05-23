@@ -73,3 +73,15 @@ models/
 .data/
 *.db
 *.sqlite
+
+# Generated dataset artifacts (do not commit large datasets or binaries)
+# Keep ingestion/dataset/*.py (code) tracked; ignore generated outputs below
+ingestion/dataset/*.parquet
+ingestion/dataset/*.arrow
+ingestion/dataset/*.jsonl
+ingestion/dataset/*.hf
+ingestion/dataset/cache/
+
+# Processed and generated data
+data/
+ingestion/data/processed/

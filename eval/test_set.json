@@ -1,0 +1,402 @@
+[
+  {
+    "ticker": "JPM",
+    "domain": "Litigation",
+    "question_type": "False_Premise",
+    "filing": "Q4 2024 10-Q",
+    "question": "What litigation reserve did JPMorgan establish in Q4 2024 for the DOJ FX wire fraud criminal indictment and how does potential conviction risk affect its banking charter per the Q4 2024 10-Q?",
+    "answer": "FALSE — No DOJ criminal indictment against JPMorgan for EM FX benchmark manipulation is disclosed in the Q4 2024 10-Q; no such indictment occurred during this period."
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Litigation",
+    "question_type": "Out_of_Scope",
+    "filing": "2024 10-K",
+    "question": "What are the full verbatim transcripts of AMD's sealed arbitration proceedings against former employees accused of stealing CDNA GPU architecture trade secrets — including the names of the employees, the specific RTL code modules allegedly misappropriated, the destination companies that received the stolen IP, and the confidential settlement amounts AMD received — as referenced obliquely in the Legal Proceedings section of the FY2024 10-K?",
+    "answer": "SEC Legal Proceedings disclosures describe material litigation by general category, nature of the claim, and estimated financial exposure where determinable — they never reproduce sealed arbitration transcripts, identify employees by name in confidential proceedings, specify RTL code modules at issue in trade secret cases, name companies allegedly receiving misappropriated IP, or disclose confidential settlement amounts. Sealed arbitration proceedings are confidential by their governing rules and legally protected from public disclosure. Settlement terms are almost universally covered by non-disclosure agreements. The Legal Proceedings section is a summary disclosure of litigation existence and materiality — not a repository of sealed proceeding records, forensic IP analyses, or settlement documentation."
+  },
+  {
+    "ticker": "MSFT",
+    "domain": "Litigation",
+    "question_type": "Multi_Hop",
+    "filing": "2024 10-K",
+    "question": "Microsoft's FY2024 10-K Contingencies footnote discloses the IRS is asserting approximately $28.9B in additional taxes, penalties, and interest for tax years 2004–2013. The Income Tax footnote discloses Microsoft's total unrecognized tax benefit reserve. The MD&A discusses the effective tax rate as a driver of net income growth. Cross-referencing the $28.9B IRS claim against the UTB reserve, what percentage of the IRS asserted claim is covered — and what is the maximum after-tax EPS impact if the claim is upheld and the reserve is insufficient?",
+    "answer": "Compute UTB coverage ratio (Contingencies vs. Tax footnote), convert any shortfall to after-tax EPS impact using income statement data — three sections that each contain a piece of the exposure but never synthesize the coverage gap or EPS sensitivity."
+  },
+  {
+    "ticker": "INTC",
+    "domain": "Litigation",
+    "question_type": "Direct",
+    "filing": "Q4 2024 10-Q",
+    "question": "In Intel's Q4 2024 10-Q (period ending December 28, 2024), does Intel disclose any new material legal proceedings initiated during Q4 2024, and what is Intel's standard disclosure conclusion regarding pending litigation?",
+    "answer": "Intel's Q4 2024 10-Q does not disclose material new legal proceedings beyond those previously disclosed (the IRS transfer pricing matter and EC antitrust proceeding). Intel reaffirms that no pending matter, other than those specifically disclosed, is expected to have a material adverse effect on its consolidated financial position, results of operations, or cash flows."
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Guidance",
+    "question_type": "Multi_Hop",
+    "filing": "Q4 2024 10-Q",
+    "question": "The Q4 FY2024 MD&A shows R&D expense growing sequentially, with management commentary referencing accelerated investment in next-generation GPU architecture (CDNA4/CDNA5) and software ecosystem. The SBC footnote discloses unamortized stock compensation cost by award type and weighted-average recognition periods. Synthesizing both: given that SBC functions as a forward hiring commitment already contractually authorized, what is the implied incremental technical headcount AMD has committed to onboard over the next 18 months, and how does that hiring trajectory affect the forward R&D expense run-rate relative to current non-GAAP operating margin guidance?",
+    "answer": "Bridges the qualitative R&D investment narrative (MD&A) to the mechanical SBC amortization schedule (Notes) to derive an implied headcount and expense trajectory — two entirely separate sections."
+  },
+  {
+    "ticker": "TSLA",
+    "domain": "Risk_Factors",
+    "question_type": "Temporal_Comparison",
+    "filing": "Cross_Filing",
+    "question": "Did TSLA's disclosed risks related to CEO concentration risk, key-person dependency on Elon Musk, and reputational spillover from his external activities become more or less prominent or specifically worded between FY2023 and FY2024 10-K filings?",
+    "answer": "Compare key-person and CEO concentration risk paragraphs across both annual filings; assess changes in paragraph length, specificity of named reputational risks, and presence of any new language addressing conflicts of interest or time-allocation concerns"
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Guidance",
+    "question_type": "Qualitative",
+    "filing": "2023 10-K",
+    "question": "How does AMD's management characterize its AI accelerator market opportunity in the FY2023 10-K forward-looking disclosures, and does the language reflect a realistic competitive roadmap or an aspirational narrative designed to reframe AMD's identity during a period of financial stress?",
+    "answer": "The FY2023 10-K is qualitatively significant as the document in which AMD's management formally pivots its corporate identity toward AI infrastructure — adopting language that positions MI300X as a generational product capable of reshaping AMD's competitive trajectory. The forward-looking tone is openly aspirational: management projects a '$400B+ total AI accelerator market by 2027' TAM framing, introduces 'open ecosystem' as a strategic differentiator, and uses MI300X customer proof points to validate the narrative while the product was still ramping. For macro researchers, the FY2023 10-K functions as a strategic inflection document: the language is genuinely aspirational rather than operationally grounded, and subsequent filings should be evaluated for how much of the FY2023 aspiration has been converted into disclosed financial reality."
+  },
+  {
+    "ticker": "GOOGL",
+    "domain": "Risk_Factors",
+    "question_type": "False_Premise",
+    "filing": "2024 10-K",
+    "question": "What methodology did Alphabet use to conclude EU AI Act compliance costs are immaterial, and in which balance sheet line is the provision recorded?",
+    "answer": "FALSE — The 2024 10-K does not characterize EU AI Act compliance costs as immaterial or disclose a specific provision."
+  },
+  {
+    "ticker": "AMZN",
+    "domain": "Risk_Factors",
+    "question_type": "Qualitative",
+    "filing": "Q4 2024 10-Q",
+    "question": "By Q4 2024, how does management characterize the operational and reputational risks associated with Amazon's expanding AI service offerings—including Bedrock and Q—and does the risk factor language suggest concerns around model reliability, third-party model dependency, or regulatory AI liability are being treated as material near-term exposures?",
+    "answer": "Q4 2024 risk disclosures expand AI-specific risk language to include third-party foundation model reliability, hallucination liability in enterprise deployments, and evolving AI regulatory frameworks across the EU and U.S. Management tone is proactive rather than reactive, framing these as known and managed risks, but the structural prominence of AI liability language—especially around Bedrock's multi-model marketplace—implies growing internal recognition that AI service failures could carry reputational and financial consequences at scale."
+  },
+  {
+    "ticker": "TSLA",
+    "domain": "Litigation",
+    "question_type": "Temporal_Comparison",
+    "filing": "Cross_Filing",
+    "question": "How did the aggregate scope and financial exposure of disclosed legal proceedings in TSLA's FY2023 10-K compare to FY2024, and did any new material litigation categories — particularly related to Autopilot/FSD accident liability, securities fraud claims, or CEO compensation disputes — emerge or escalate in the later filing?",
+    "answer": "Extract and categorize all legal proceedings disclosures from both 10-K filings; compare case count, accrual amounts, estimated liability ranges, and any newly introduced or materially expanded litigation themes such as autonomous vehicle liability, shareholder actions, or board governance disputes"
+  },
+  {
+    "ticker": "META",
+    "domain": "Revenue",
+    "question_type": "False_Premise",
+    "filing": "2023 10-K",
+    "question": "Which quarter did Reality Labs turn profitable in 2023 and what gross margin did it report after Quest 3 crossed 10M units sold?",
+    "answer": "FALSE — Reality Labs reported an operating loss of ~$16.1B for full-year 2023; it has never posted a profitable quarter as a disclosed segment."
+  },
+  {
+    "ticker": "INTC",
+    "domain": "Revenue",
+    "question_type": "Out_of_Scope",
+    "filing": "2024 10-K",
+    "question": "Can you provide Intel's internal IFS customer revenue waterfall showing the exact contracted wafer volumes, per-wafer ASPs, and confidential technology surcharges negotiated separately with each prospective IFS external customer (including Microsoft, Qualcomm, and Amazon) for Intel 18A production slots — along with the private side agreements that govern what happens to those commitments if Intel 18A yields fall below the contractually specified defect density threshold?",
+    "answer": "SEC filings disclose IFS as a reportable segment with aggregated revenue figures only. Individual customer wafer volume commitments, per-wafer pricing, technology surcharges, and yield-contingent contract penalty or release clauses are proprietary commercial terms protected under foundry customer NDAs — among the most sensitive competitive information Intel possesses as it attempts to build an external foundry business. No Regulation S-K item, ASC 606 disaggregation requirement, or SEC disclosure rule compels disclosure of individual customer contract economics or the conditional clauses embedded in foundry service agreements. Publishing this information would destroy the commercial confidentiality that Intel's IFS customer relationships depend upon."
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Guidance",
+    "question_type": "Direct",
+    "filing": "Q4 2024 10-Q",
+    "question": "What non-GAAP gross margin percentage did AMD guide for in Q4 2024 as disclosed in the Q3 2024 10-Q, and what was the stated tolerance?",
+    "answer": "AMD guided for Q4 2024 non-GAAP gross margin of approximately 54%, plus or minus 50 basis points."
+  },
+  {
+    "ticker": "MSFT",
+    "domain": "Litigation",
+    "question_type": "Temporal_Comparison",
+    "filing": "2023 10-K → 2024 10-K",
+    "question": "How did the characterization of Microsoft's IRS $28.9B transfer pricing dispute evolve between FY2023 and FY2024, and does the procedural advancement to the IRS Appeals Office suggest a shift in resolution probability or timeline?",
+    "answer": "FY2023: IRS dispute in examination phase, ~$28.9B asserted, Microsoft contesting, 'well-supported' language, no accrual. FY2024: procedural advance disclosed — matter moved to IRS Independent Office of Appeals (the settlement negotiation stage before potential Tax Court). Same ~$28.9B figure, same no-accrual, same 'well-supported' language. The procedural advancement is a meaningful temporal delta — Appeals is typically where IRS disputes resolve without Tax Court litigation. However, Microsoft's unchanged language (no softening toward settlement, no range of loss, no changed outcome probability signal) suggests no imminent resolution. For a $28.9B contingency representing ~26% of FY2024 operating income, the continued no-accrual position signals high confidence in transfer pricing positions surviving challenge. The matter is moving closer to resolution or Tax Court in both time and procedure — the FY2025 filing will be the critical disclosure window."
+  },
+  {
+    "ticker": "INTC",
+    "domain": "Guidance",
+    "question_type": "Temporal_Comparison",
+    "filing": "Q3 2024 10-Q → Q4 2024 10-Q",
+    "question": "How did Intel's Q3 2024 revenue guidance compare to actual results, and how did Q4 2024 guidance subsequently step — and what does the pattern reveal about Intel's demand visibility and forecasting credibility during restructuring?",
+    "answer": "Q3 2024 guidance: $12.5B–$13.5B (midpoint $13.0B). Actual: $13.284B — upper end beat, ~$284M above midpoint. Q4 2024 guidance: $13.3B ±$500M — essentially flat QoQ, implying zero sequential growth expected. Pattern of upper-end Q3 beat followed by flat Q4 guidance contrasts sharply with AMD (+10% QoQ step) and NVIDIA (+7% QoQ step). Intel's flat Q4 guide reflects: no Gaudi revenue acceleration, PC seasonality benefits captured, restructuring-related customer concern about roadmap continuity. The ±$500M guidance range itself (vs. AMD's ±$300M) signals materially reduced demand visibility, consistent with navigating simultaneous competitive deterioration and internal restructuring."
+  },
+  {
+    "ticker": "AAPL",
+    "domain": "Revenue",
+    "question_type": "Multi_Hop",
+    "filing": "2024 10-K",
+    "question": "The MD&A reports Services revenue of ~$96B in FY2024 and highlights App Store commissions, Google search licensing, and Apple Advertising as growth drivers. The revenue recognition footnote describes Apple's principal vs. agent assessment for App Store transactions (recognizing only net commission) and the variable consideration treatment for Google's TAC payments. Synthesizing both: what is the implied gross transaction volume flowing through the App Store relative to net commission revenue Apple recognizes, and if regulators mandate a commission reduction from 30% to 15% industry-wide, what is the mathematical impact on reported Services net revenue — and does the licensing revenue recognition methodology create a contingent revenue risk if the Google TAC arrangement is unwound by antitrust action?",
+    "answer": "Requires connecting the Services growth narrative (MD&A) to the principal/agent and variable consideration mechanics (Notes) — sections with no internal cross-reference whose interaction determines the regulatory revenue fragility of Apple's highest-margin segment."
+  },
+  {
+    "ticker": "GOOGL",
+    "domain": "Litigation",
+    "question_type": "Temporal_Comparison",
+    "filing": "Cross_Filing",
+    "question": "Did GOOGL's disclosed contingent liabilities related to the DOJ Search antitrust case materially change in scope, language, or estimated financial exposure between the FY2023 and FY2024 10-K filings?",
+    "answer": "Cross-reference the Legal Proceedings and Commitments & Contingencies footnotes across both annual filings; track changes in settlement probability language and accrual disclosures"
+  },
+  {
+    "ticker": "AMZN",
+    "domain": "Risk_Factors",
+    "question_type": "Direct",
+    "filing": "2024 10-K",
+    "question": "According to the 2024 10-K risk_factors, what specific risk does Amazon cite regarding China-based sellers and suppliers with respect to its revenue?",
+    "answer": "China-based sellers account for significant portions of Amazon's third-party seller services and advertising revenues, and China-based suppliers provide significant portions of its components and finished goods; regulatory, trade restrictions, geopolitical events, or other factors negatively impacting China-based sellers and suppliers could adversely affect operating results"
+  },
+  {
+    "ticker": "JPM",
+    "domain": "Revenue",
+    "question_type": "Direct",
+    "filing": "2024 10-K",
+    "question": "What was JPMorganChase's total reported net revenue for the full fiscal year ended December 31, 2024?",
+    "answer": "$177.6 billion (reported basis); $180.6 billion on a managed (non-GAAP) basis"
+  },
+  {
+    "ticker": "AMZN",
+    "domain": "Revenue",
+    "question_type": "Multi_Hop",
+    "filing": "2024 10-K",
+    "question": "The 2024 10-K discloses that Amazon Web Services offers reserved instance pricing as a mechanism for customers to commit to capacity in exchange for discounted rates. The Revenue Recognition footnote discloses that prepaid reserved instance contracts create contract liabilities recognized ratably over the reservation period. The Commitments and Contingencies footnote separately discloses customer refund obligations and service credits. By triangulating the contract liability balance from reserved instance prepayments in the recognition footnote against the service credit and refund commitment language in the contingencies footnote and the AWS growth trajectory in MD&A, what does the ratio of contract liabilities to recognized AWS revenue imply about customer commitment depth — and does a declining contract liability ratio signal migration risk from reserved to on-demand pricing that the growth narrative obscures?",
+    "answer": "MD&A (AWS growth and pricing narrative) × Revenue recognition footnote (reserved instance contract liabilities, ratable recognition) × Commitments footnote (service credits and refund obligations)"
+  },
+  {
+    "ticker": "META",
+    "domain": "Revenue",
+    "question_type": "Multi_Hop",
+    "filing": "Q3 2024 10-Q",
+    "question": "The Q3 2024 10-Q Business section describes Meta's expansion of AI-powered ad targeting through the Andromeda and GEM recommendation systems. The Revenue Recognition footnote discloses that Meta acts as a principal (not agent) in its advertising arrangements, recognizing gross revenue. The Related Party Transactions note discloses certain data-sharing or infrastructure arrangements. By cross-referencing the principal vs. agent revenue recognition treatment in the footnote against the AI targeting infrastructure description and the cost of revenue breakdown in MD&A, does the gross revenue recognition approach obscure the true net economics of AI-enhanced ad delivery, and how does the cost of Andromeda/GEM infrastructure compare to the incremental revenue it generates?",
+    "answer": "Business section (Andromeda/GEM AI targeting) × Revenue recognition footnote (principal vs. agent) × Cost of revenue in MD&A"
+  },
+  {
+    "ticker": "GOOGL",
+    "domain": "Revenue",
+    "question_type": "Qualitative",
+    "filing": "Q4 2024 10-Q",
+    "question": "In Q4 2024 commentary, how does management explain the sequential acceleration in Google Cloud revenue growth, and does their language suggest this trajectory is driven by durable enterprise AI adoption or short-term pull-forward demand?",
+    "answer": "Management attributes Cloud acceleration to enterprise AI infrastructure buildout and long-cycle contract wins. The tone is deliberately forward-leaning, with frequent references to backlog and multi-year commitments, suggesting confidence in durability rather than transitory demand."
+  },
+  {
+    "ticker": "NVDA",
+    "domain": "Risk_Factors",
+    "question_type": "Direct",
+    "filing": "Q4 2024 10-Q",
+    "question": "In NVIDIA's Q3 FY2025 10-Q (three months ended October 27, 2024), what percentage of total revenue did the United States represent, and what percentage did China (including Hong Kong) represent?",
+    "answer": "The United States represented approximately 57% of total Q3 FY2025 revenue and China (including Hong Kong) represented approximately 13% of total revenue."
+  },
+  {
+    "ticker": "MSFT",
+    "domain": "Guidance",
+    "question_type": "Temporal_Comparison",
+    "filing": "2023 10-K → 2024 10-K",
+    "question": "How did Microsoft's capex trajectory relative to Azure revenue acceleration reveal whether FY2024's infrastructure investment is leading demand (speculative) or lagging demand (supply-constrained), and what does this determination imply for FY2025–FY2026 capital efficiency?",
+    "answer": "FY2022→FY2023 capex: $23.9B→$28.1B (+$4.2B). FY2023→FY2024: $28.1B→$55.7B (+$27.6B) — near-doubling. Azure CC growth re-accelerated from ~27% to ~29-30% despite the massive capex surge. Q3 and Q4 FY2024 earnings calls explicitly noted customer demand exceeding available capacity. This supply-demand dynamic — more demand than capacity despite record capex — confirms investment is supply-constrained, not speculative. Microsoft is chasing a known demand curve with observable customer commitment backlog ($269B RPO), not building ahead of uncertain future demand. Contrast with Intel's equivalent magnitude investment in foundry capacity with uncertain external customer demand — Microsoft's capex bet has materially lower demand-side risk but carries significant execution risk (construction timelines, equipment delivery, AI chip availability) that only emerges in FY2025-FY2026 data."
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Supply Chain",
+    "question_type": "Multi_Hop",
+    "filing": "2023 10-K",
+    "question": "The FY2023 MD&A discusses material inventory write-downs and excess purchase commitment charges incurred as PC/gaming demand correction unwound overstated channel inventories. The inventory accounting and purchase commitment footnote describes AMD's NRV methodology and the threshold at which commitment losses are accrued. Synthesizing both: at what inventory-to-forward-revenue coverage ratio does AMD's accounting policy mechanically trigger a write-down, and based on the charges taken in FY2023, what inventory overhang ratio existed at peak — and does that ratio currently reappear in any segment-level balance sheet disclosure?",
+    "answer": "Requires connecting the qualitative charge narrative (MD&A) to the precise accounting trigger mechanics (Notes inventory policy) — sections separated by many pages in the filing."
+  },
+  {
+    "ticker": "MSFT",
+    "domain": "Revenue",
+    "question_type": "Multi_Hop",
+    "filing": "Q4 2024 10-Q",
+    "question": "Microsoft's Q4 FY2024 10-Q reports Productivity and Business Processes revenue of ~$20.3B with Office Commercial growing ~12% YoY. The geographic revenue footnote breaks out US vs. Other Countries revenue. The Risk_Factors warn about FX volatility with USD-denominated costs against local currency revenues. Using the constant-currency vs. as-reported growth differential in MD&A alongside the geographic revenue split in the Notes, what is the implied effective FX drag in basis points on Productivity segment revenue for Q4 FY2024, and which geographic concentration makes Microsoft most exposed to a USD strengthening scenario?",
+    "answer": "Compute FX drag from the CC/as-reported spread (MD&A), map it to geographic revenue concentration (Notes footnote), then connect to the structural FX asymmetry (Risk_Factors) — a three-section triangulation never performed within the filing."
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Risk_Factors",
+    "question_type": "Qualitative",
+    "filing": "2024 10-K",
+    "question": "How has the framing of NVIDIA's CUDA ecosystem lock-in as a competitive risk evolved in AMD's FY2024 10-K relative to the FY2023 filing, and does the shift in language suggest growing strategic concern about software moat permanence or increasing confidence in ROCm's competitive parity?",
+    "answer": "Comparing AMD's FY2023 and FY2024 10-K Risk_Factors reveals a subtle but meaningful tonal evolution in how management characterizes the CUDA software ecosystem risk. The FY2024 filing adopts more specific and mechanistic risk language — enumerating particular CUDA dependencies (library ecosystems, developer toolchains, enterprise certification programs) that ROCm must overcome — whereas FY2023 language was more generic. This increased specificity paradoxically signals both greater competitive awareness and greater residual concern: by becoming more precise about what ROCm lacks, management implicitly acknowledges the gap is not yet closed. For macro researchers, this tonal escalation suggests AMD's management views the AI accelerator market as increasingly a software competition, not merely a silicon race — but the Risk_Factors tone does not yet reflect confidence that AMD's investment is sufficient."
+  },
+  {
+    "ticker": "MSFT",
+    "domain": "Supply Chain",
+    "question_type": "Direct",
+    "filing": "2024 10-K",
+    "question": "What was the total amount of Microsoft's capital expenditures (additions to property and equipment) for fiscal year 2024 as reported in the consolidated cash flow statement of the FY2024 10-K?",
+    "answer": "Microsoft's capital expenditures for FY2024 were $55.718 billion, as reported in the investing activities section of the consolidated cash flow statement, reflecting heavy investment in cloud and AI data center infrastructure."
+  },
+  {
+    "ticker": "META",
+    "domain": "Revenue",
+    "question_type": "Multi_Hop",
+    "filing": "2024 10-K",
+    "question": "The 2024 10-K discloses WhatsApp Business API and click-to-WhatsApp advertising as growing revenue streams within Family of Apps. The Notes to Financial Statements include a Contract Liabilities footnote disclosing deferred revenue from business messaging contracts. The MD&A separately discusses the monetization roadmap for WhatsApp. By triangulating the disclosed contract liability balance for business messaging against the WhatsApp monetization narrative in MD&A and the total Family of Apps revenue in the segment footnote, what percentage of WhatsApp's implied revenue contribution is already contractually committed versus dependent on future adoption — and does the deferred balance imply over- or under-representation of WhatsApp in reported revenue?",
+    "answer": "MD&A (WhatsApp monetization roadmap) × Contract liabilities/deferred revenue footnote × Segment revenue footnote (Family of Apps)"
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Supply Chain",
+    "question_type": "False_Premise",
+    "filing": "2024 10-K",
+    "question": "What were the yield ramp costs of migrating Xilinx FPGAs from Samsung 16nm to TSMC N5, and how did the transition affect Embedded segment margins in FY2024?",
+    "answer": "False. Xilinx FPGAs were on TSMC nodes at acquisition, not Samsung 16nm. High-end Xilinx products use TSMC 7nm/16nm. No Samsung-to-TSMC N5 migration for Xilinx FPGAs is disclosed in the FY2024 10-K."
+  },
+  {
+    "ticker": "AMZN",
+    "domain": "Guidance",
+    "question_type": "Direct",
+    "filing": "2024 10-K",
+    "question": "What operating income range did Amazon guide for Q1 2025, as provided in the Q4 2024 earnings release accompanying the 2024 10-K?",
+    "answer": "$14.0 billion to $18.0 billion, compared with $15.3 billion in Q1 2024"
+  },
+  {
+    "ticker": "GOOGL",
+    "domain": "Supply Chain",
+    "question_type": "Temporal_Comparison",
+    "filing": "Cross_Filing",
+    "question": "Did GOOGL's disclosed reliance on third-party hardware suppliers (e.g., for TPUs and server components) increase or decrease as a stated operational risk between the FY2022 and FY2024 10-K filings?",
+    "answer": "Review Risk_Factors and Operations sections in both filings; flag additions, deletions, or tonal escalations in supplier dependency language"
+  },
+  {
+    "ticker": "GOOGL",
+    "domain": "Litigation",
+    "question_type": "Temporal_Comparison",
+    "filing": "Cross_Filing",
+    "question": "How did the tone and specificity of GOOGL's EU Digital Markets Act (DMA) compliance risk disclosures evolve between the FY2022 and FY2024 10-K filings as enforcement deadlines approached?",
+    "answer": "Compare EU regulatory litigation and compliance language across three 10-K filings; assess escalation in DMA-specific disclosures, cited penalty exposure, and management's stated mitigation strategies"
+  },
+  {
+    "ticker": "NVDA",
+    "domain": "Guidance",
+    "question_type": "False_Premise",
+    "filing": "Q3 2024 10-Q",
+    "question": "By how much did NVDA reduce its Q4 FY2024 guidance in the mid-quarter 8-K, and what was the revised range relative to original guidance?",
+    "answer": "False. NVDA did not issue a mid-quarter guidance reduction via 8-K for Q4 FY2024. NVDA only provides guidance at earnings calls. No intra-quarter downward revision occurred."
+  },
+  {
+    "ticker": "INTC",
+    "domain": "Revenue",
+    "question_type": "Qualitative",
+    "filing": "2024 10-K",
+    "question": "How does management characterize Intel's CCG and DCAI revenue trajectories in the FY2024 10-K — does the language reflect genuine confidence in a demand-driven recovery or a defensive framing of market share losses as temporary and externally caused?",
+    "answer": "Intel's FY2024 10-K revenue language occupies an unusual tonal register: management is simultaneously on the back foot — acknowledging significant share losses to AMD in both client and server markets — and projecting forward confidence anchored to product cycle transitions (Meteor Lake, Granite Rapids, Gaudi 3). The rhetorical strategy is to attribute recent revenue declines to execution gaps now being addressed rather than to structural competitive displacement, allowing management to present recovery as mechanical and imminent without conceding that AMD's architectural advantages may be durable. The macro implication is that Intel's FY2024 10-K functions as a transitional accountability document: management is forced to narrate decline while simultaneously arguing the decline is self-correcting, creating a credibility tension that investors must evaluate against product roadmap evidence independently."
+  },
+  {
+    "ticker": "TSLA",
+    "domain": "Litigation",
+    "question_type": "Multi_Hop",
+    "filing": "Q3 2024 10-Q",
+    "question": "The Q3 2024 10-Q Legal Proceedings section discloses an ongoing FTC investigation and state AG actions related to Tesla's advertising claims about Autopilot and FSD range and capability, including allegations of deceptive marketing under FTC Act Section 5. The Business Overview describes Tesla's direct-to-consumer sales model, which relies on online configurator pricing that bundles FSD as an optional upgrade with specific capability representations. The Revenue Recognition footnote discloses that FSD upgrade revenue is deferred and recognized upon capability delivery, with the capability description forming part of the performance obligation definition. By connecting the FTC deceptive advertising investigation in Legal Proceedings to the capability-based performance obligation definition in the revenue footnote and the direct-sales configurator model in the Business Overview, does a finding of deceptive advertising about FSD capabilities require Tesla to redefine FSD performance obligations — potentially triggering a revenue recognition restatement risk not disclosed in the contingencies footnote?",
+    "answer": "Legal Proceedings (FTC deceptive advertising investigation re: FSD capabilities) × Business Overview (direct-to-consumer configurator / FSD upgrade pricing) × Revenue recognition footnote (FSD capability as performance obligation definition)"
+  },
+  {
+    "ticker": "AAPL",
+    "domain": "Risk_Factors",
+    "question_type": "Qualitative",
+    "filing": "2024 10-K",
+    "question": "How does the FY2024 10-K Risk_Factors language around App Store regulatory risk — spanning the EU Digital Markets Act, U.S. DOJ antitrust action, and third-party payment mandates — characterize the cumulative threat to Apple's Services revenue model, and does the tone signal genuine strategic vulnerability or managed regulatory friction?",
+    "answer": "Apple's FY2024 10-K Risk_Factors treatment of App Store regulatory risk represents one of the most consequential tonal evolutions in Apple's recent filing history: the language has shifted from describing regulatory risks as hypothetical to acknowledging that DMA gatekeeper obligations are already generating compliance costs and fee structure modifications. However, the tone carefully avoids quantifying the revenue impact of any specific DMA compliance measure — never connecting fee structure changes to a specific Services revenue impact range. By keeping regulatory risk language in the qualitative domain while the MD&A presents Services revenue growth in quantitative terms, management prevents investors from calculating the regulatory revenue-at-risk from the disclosed compliance changes. The cumulative App Store regulatory risk disclosed — DMA, DOJ, state AG actions, developer class actions — represents a multi-jurisdictional threat that the risk language acknowledges in breadth but deliberately understates in financial magnitude."
+  },
+  {
+    "ticker": "GOOGL",
+    "domain": "Litigation",
+    "question_type": "Temporal_Comparison",
+    "filing": "Cross_Filing",
+    "question": "How did the aggregate number and financial scope of disclosed legal proceedings in GOOGL's FY2023 10-K compare to FY2024, and did any new material litigation categories emerge in the later filing?",
+    "answer": "Extract and categorize all legal proceedings disclosures from both 10-K filings; compare case count, estimated liability ranges, and any newly introduced litigation categories"
+  },
+  {
+    "ticker": "AAPL",
+    "domain": "Supply Chain",
+    "question_type": "Multi_Hop",
+    "filing": "2024 10-K",
+    "question": "The Business Overview describes Apple's deep dependency on TSMC for all Apple Silicon production and on Foxconn/Pegatron/Luxshare for final iPhone and Mac assembly, with no disclosed alternative qualified suppliers at equivalent scale. The purchase obligations footnote quantifies Apple's multi-year non-cancelable manufacturing and component commitments. Synthesizing both: if TSMC experienced a 60-day force-majeure production halt, what is the combined financial exposure from take-or-pay commitments plus foregone iPhone revenue — and does Apple's disclosed inventory balance provide sufficient finished goods and component buffer to sustain retail supply chains for more than 30 days without new TSMC wafer starts, given typical iPhone production-to-shelf lead times?",
+    "answer": "Links the strategic sole-source dependency narrative (Business section) to the contractual commitment schedule and inventory balance (Notes and balance sheet) — three structurally disconnected sections revealing Apple's true Taiwan disruption exposure."
+  },
+  {
+    "ticker": "META",
+    "domain": "Risk_Factors",
+    "question_type": "False_Premise",
+    "filing": "2023 10-K",
+    "question": "What specific CJEU ruling language did Meta cite in its 2023 10-K when removing EU data-transfer risk from its disclosures?",
+    "answer": "FALSE — EU data-transfer and regulatory risk remains disclosed in the 2023 10-K; the DPF was adopted but Meta did not remove the risk factor."
+  },
+  {
+    "ticker": "JPM",
+    "domain": "Revenue",
+    "question_type": "Out_of_Scope",
+    "filing": "2024 10-K",
+    "question": "What is the exact net interest income generated per individual client relationship tier, broken down by proprietary credit score band, relationship manager desk, and intraday Fed Funds rate fluctuation window across JPMorgan's Private Bank during each trading session of 2024?",
+    "answer": "SEC filings report net interest income and fee revenue at business segment levels such as Consumer & Community Banking and Commercial Banking; per-client-tier intraday NII attribution tied to proprietary credit scoring bands and individual relationship manager desks are confidential client management metrics that are never disclosed in any 10-K or 10-Q filing."
+  },
+  {
+    "ticker": "MSFT",
+    "domain": "Guidance",
+    "question_type": "False_Premise",
+    "filing": "2024 10-K",
+    "question": "The FY2024 10-K's five-year $200B CapEx commitment to AI infrastructure — how should investors model depreciation drag on operating margins through FY2029?",
+    "answer": "False. The FY2024 10-K does not contain a formal five-year $200B CapEx commitment. While Microsoft disclosed higher CapEx (~$55B in FY2024) and signaled continued investment, no binding five-year figure of that magnitude appears in the filing."
+  },
+  {
+    "ticker": "INTC",
+    "domain": "Supply Chain",
+    "question_type": "Temporal_Comparison",
+    "filing": "2023 10-K → 2024 10-K",
+    "question": "How did Intel's annual capex levels and gross-vs-net composition change between FY2023 and FY2024, and what does the capex intensity relative to revenue signal about the financial sustainability of Intel's IDM 2.0 investment thesis?",
+    "answer": "FY2023: gross capex ~$25.8B, net capex ~$20.8B, revenue $54.2B — gross capex intensity ~48%. FY2024: gross capex ~$24.8B, net capex ~$11.8B (significant Smart Capital offset reduction), revenue $53.1B — gross intensity ~47%, net intensity ~22%. Smart Capital strategy successfully reduced net burden, but two concerns persist: (1) gross capex barely declined despite massive restructuring, implying enormous underlying fab commitments remain; (2) at ~47% gross capex intensity on flat revenue with Intel Foundry losing $13.4B, FCF is deeply negative and unsustainable without revenue growth the competitive environment is not delivering."
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Revenue",
+    "question_type": "Multi_Hop",
+    "filing": "2024 10-K",
+    "question": "The MD&A reports Data Center revenue nearly doubled YoY to ~$12.6B in FY2024, driven by MI300X ramp. The revenue recognition footnote describes AMD's sell-in methodology for certain channels and the treatment of variable consideration (price protection, rotation rights) for distributor-held inventory. Synthesizing both: what portion of the reported Data Center growth could reflect accelerated sell-in to distributors ahead of constrained end-customer availability, and how would a reversal of variable consideration estimates — if distributor inventory levels exceeded normalized turns — affect the reported growth rate?",
+    "answer": "Requires connecting the segment growth narrative in MD&A to the distribution channel revenue recognition mechanics in the Notes — sections with no internal cross-reference."
+  },
+  {
+    "ticker": "JPM",
+    "domain": "Litigation",
+    "question_type": "Direct",
+    "filing": "2024 10-K",
+    "question": "On December 20, 2024, the CFPB filed a lawsuit against JPMorgan Chase Bank, N.A. and two other major banks. What were the allegations and who were the co-defendants?",
+    "answer": "The CFPB filed a lawsuit against Early Warning Services, LLC (EWS/Zelle parent), Bank of America, N.A., JPMorgan Chase Bank, N.A., and Wells Fargo Bank, N.A., alleging they failed to safeguard the Zelle network from fraud and other defects, resulting in hundreds of millions of dollars in consumer losses (over $870 million per the complaint)"
+  },
+  {
+    "ticker": "META",
+    "domain": "Supply Chain",
+    "question_type": "False_Premise",
+    "filing": "2023 10-K",
+    "question": "What performance benchmarks did Meta's MTIA chips achieve after moving production to Intel Foundry Services, per the 2023 10-K disclosures?",
+    "answer": "FALSE — The 2023 10-K discloses no foundry switch for MTIA chips to Intel Foundry Services."
+  },
+  {
+    "ticker": "META",
+    "domain": "Litigation",
+    "question_type": "Temporal_Comparison",
+    "filing": "Cross_Filing",
+    "question": "How did the tone and specificity of META's EU Digital Markets Act (DMA) and DSA compliance risk disclosures evolve between the FY2022 and FY2024 10-K filings, and did management's characterization of potential financial penalties become more or less quantified over time?",
+    "answer": "Compare EU regulatory compliance and litigation language across three 10-K filings; assess escalation in DMA/DSA-specific disclosures, cited penalty exposure as a percentage of global revenue, and management's stated remediation timelines"
+  },
+  {
+    "ticker": "TSLA",
+    "domain": "Litigation",
+    "question_type": "Direct",
+    "filing": "2024 10-K",
+    "question": "What was the approximate total value of the 2018 CEO Performance Award (Elon Musk's compensation plan) that the Delaware Court of Chancery ordered rescinded in January 2024, as described in Tesla's 2024 10-K disclosures?",
+    "answer": "The 2018 CEO Performance Award had an estimated maximum value of approximately $55.8 billion (described as the largest compensation plan in the history of public markets), consisting of twelve option tranches"
+  },
+  {
+    "ticker": "META",
+    "domain": "Risk_Factors",
+    "question_type": "Multi_Hop",
+    "filing": "2023 10-K",
+    "question": "The 2023 10-K Risk_Factors warn that increased regulatory scrutiny of AI systems — including the EU AI Act — could require costly compliance investments or product modifications. The Business Overview describes the deployment of AI ranking and recommendation models across Feed, Reels, and Ads. The Income Tax footnote discloses R&D tax credits claimed for AI development activities. By connecting the EU AI Act compliance risk in Risk_Factors to the AI system deployment described in Business Overview and cross-referencing the R&D tax credit disclosures in the tax footnote, does the scale of R&D credits claimed for AI systems create a secondary risk: that regulatory reclassification of AI activities could trigger credit recapture, amplifying the direct compliance cost disclosed in Risk_Factors?",
+    "answer": "Risk_Factors (EU AI Act regulatory risk) × Business Overview (AI ranking/recommendation deployment) × Income Tax footnote (R&D credits for AI)"
+  },
+  {
+    "ticker": "AMD",
+    "domain": "Revenue",
+    "question_type": "Qualitative",
+    "filing": "Q3 2024 10-Q",
+    "question": "In the Q3 FY2024 10-Q, how does management frame the ongoing Embedded segment revenue decline and inventory digestion narrative — as a near-term cyclical trough or as a signal of structural demand impairment in AMD's legacy FPGA and adaptive compute markets?",
+    "answer": "Management's Q3 FY2024 10-Q language on Embedded segment weakness is measured and cyclically framed — using 'inventory normalization' and 'digestion cycle' vocabulary that deliberately positions the decline as a temporary correction rather than a secular demand problem. The tone conspicuously avoids any acknowledgment of competitive pressure from Intel's FPGA division or shifting customer preferences toward custom ASICs. Strategically, management appears to be preserving optionality: by describing Embedded weakness as purely cyclical, the narrative allows for a recovery claim in future quarters without requiring an explanation of market share dynamics. For macro researchers, the qualitative signal is that AMD's management is using inventory-digestion language as a rhetorical floor — implying that once inventories clear, demand will mechanically return — without providing evidence that end-market demand has not also softened structurally."
+  }
+]

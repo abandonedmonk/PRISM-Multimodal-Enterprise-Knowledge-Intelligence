@@ -1,53 +1,65 @@
-"""Llama 3.2 11B Vision Instruct — vLLM on Modal (A10, FP16).
+"""Qwen 2.5 14B Instruct — vLLM on Modal (A100 40GB, FP16).
 
-OpenAI-compatible multimodal endpoint for table image description.
-Accepts base64-encoded images in the OpenAI chat completions format.
+OpenAI-compatible endpoint for entity extraction, community reports,
+and table summarization. Deploys as a serverless web server.
 
 Usage:
-    modal deploy modal/vision_serve.py        # deploy
-    modal run modal/vision_serve.py           # test locally
+    modal deploy modal/llm_serve.py        # deploy
+    modal run modal/llm_serve.py           # test locally
 """
 
 import modal
 
 MINUTES = 60
+MODEL_NAME = "Qwen/Qwen2.5-14B-Instruct"
 
-MODEL_NAME = "meta-llama/Llama-3.2-11B-Vision-Instruct"
-MODEL_REVISION = "7c7feb5c3f0448f247a8aebac87e5d4b1b6a5f6e"
+hf_cache_vol = modal.Volume.from_name("huggingface-cache", create_if_missing=True)
+vllm_cache_vol = modal.Volume.from_name("vllm-cache", create_if_missing=True)
+
+app = modal.App("prism-llm-serve")
+
+
+def _download_model():
+    from huggingface_hub import snapshot_download
+    snapshot_download(
+        MODEL_NAME,
+        ignore_patterns=["*.pt", "*.gguf"],
+    )
+
 
 vllm_image = (
     modal.Image.from_registry(
         "nvidia/cuda:12.9.0-devel-ubuntu22.04", add_python="3.12"
     )
     .entrypoint([])
-    .uv_pip_install("vllm==0.21.0")
+    .uv_pip_install("vllm==0.21.0", "huggingface_hub[hf_xet]")
     .env(
         {
             "HF_XET_HIGH_PERFORMANCE": "1",
             "VLLM_LOG_STATS_INTERVAL": "5",
         }
     )
+    .run_function(
+        _download_model,
+        secrets=[modal.Secret.from_name("huggingface-secret")],
+        timeout=10 * MINUTES,
+    )
 )
-
-hf_cache_vol = modal.Volume.from_name("huggingface-cache", create_if_missing=True)
-vllm_cache_vol = modal.Volume.from_name("vllm-cache", create_if_missing=True)
-
-app = modal.App("prism-vision-serve")
 
 VLLM_PORT = 8000
 
 
 @app.function(
     image=vllm_image,
-    gpu="A10",
+    gpu="A100",
     scaledown_window=15 * MINUTES,
     timeout=10 * MINUTES,
     volumes={
-        "/root/.cache/huggingface": hf_cache_vol,
         "/root/.cache/vllm": vllm_cache_vol,
     },
+    secrets=[modal.Secret.from_name("huggingface-secret")],
 )
-@modal.concurrent(max_inputs=50)
+@modal.concurrent(max_inputs=100)
 @modal.web_server(port=VLLM_PORT, startup_timeout=10 * MINUTES)
 def serve():
     import subprocess
@@ -56,8 +68,6 @@ def serve():
         "vllm",
         "serve",
         MODEL_NAME,
-        "--revision",
-        MODEL_REVISION,
         "--served-model-name",
         MODEL_NAME,
         "--host",
@@ -70,24 +80,18 @@ def serve():
         "--tensor-parallel-size",
         "1",
         "--max-model-len",
-        "4096",
+        "32768",
         "--gpu-memory-utilization",
-        "0.92",
-        "--limit-mm-per-prompt",
-        "image=5",
+        "0.90",
     ]
 
-    print("Starting vLLM Vision:", " ".join(cmd))
+    print("Starting vLLM:", " ".join(cmd))
     subprocess.Popen(" ".join(cmd), shell=True)
 
 
 @app.local_entrypoint()
 async def main():
-    import base64
-    import io
-
     import aiohttp
-    from PIL import Image
 
     url = await serve.get_web_url.aio()
     print(f"Server URL: {url}")
@@ -98,28 +102,13 @@ async def main():
             assert resp.status == 200, f"Health check failed: {resp.status}"
         print("Health check passed!")
 
-        img = Image.new("RGB", (200, 100), color="white")
-        buf = io.BytesIO()
-        img.save(buf, format="PNG")
-        b64_img = base64.b64encode(buf.getvalue()).decode()
-
         payload = {
             "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "Describe this image briefly."},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/png;base64,{b64_img}"
-                            },
-                        },
-                    ],
-                }
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": "Extract entities from: Apple Inc. reported $394B revenue."},
             ],
             "model": MODEL_NAME,
-            "max_tokens": 100,
+            "max_tokens": 200,
         }
         async with session.post(
             "/v1/chat/completions", json=payload

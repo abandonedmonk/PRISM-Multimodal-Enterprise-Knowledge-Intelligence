@@ -15,7 +15,7 @@ Usage:
     python ingestion/scripts/pipeline.py
     
     # With options (passed through to process_all_filings)
-    python -m ingestion.scripts.pipeline --raw-dir data/raw --force
+    python -m ingestion.scripts.pipeline --force
 """
 
 import sys

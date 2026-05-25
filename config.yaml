@@ -1,0 +1,98 @@
+# Non-secret configuration defaults for PRISM.
+# Secrets (API keys, passwords) must live in .env.
+
+# LLM endpoint — used for entity extraction, community reports, table summarization.
+# Switch between local vLLM, Modal, and Fireworks by uncommenting the right one.
+llm:
+  # Local vLLM (no API key needed)
+  # base_url: "http://localhost:8000/v1"
+  # model: "Qwen/Qwen2.5-14B-Instruct"
+  # Modal (serverless, deploy with: modal deploy modal/llm_serve.py)
+  base_url: "https://anshujena007--prism-llm-serve-serve.modal.run/v1"
+  model: "Qwen/Qwen2.5-14B-Instruct"
+  # Fireworks (cloud API, needs FIREWORKS_API_KEY in .env)
+  # base_url: "https://api.fireworks.ai/inference/v1"
+  # model: "accounts/fireworks/models/gpt-oss-120b"
+
+# Vision LLM — used for table image description.
+# Llama 3.2 11B Vision (multimodal).
+vision:
+  # Local vLLM (no API key needed)
+  # base_url: "http://localhost:8001/v1"
+  # model: "meta-llama/Llama-3.2-11B-Vision-Instruct"
+  # Modal (serverless, deploy with: modal deploy modal/vision_serve.py)
+  base_url: "https://anshujena007--prism-vision-serve-serve.modal.run/v1"
+  model: "meta-llama/Llama-3.2-11B-Vision-Instruct"
+  # Groq (cloud, 30 req/min free tier)
+  # base_url: "https://api.groq.com/openai/v1"
+  # model: "meta-llama/llama-4-scout-17b-16e-instruct"
+
+# Embedding — used for entity/community vectorization.
+embedding:
+  # Local (in-process via fastembed)
+  # base_url: ""
+  # model: "BAAI/bge-small-en-v1.5"
+  # Modal (serverless, deploy with: modal deploy modal/embed_serve.py)
+  base_url: "https://anshujena007--prism-embed-serve-serve.modal.run"
+  model: "BAAI/bge-small-en-v1.5"
+
+# Reranker — used for cross-encoder reranking of retrieved chunks.
+rerank:
+  # Local (in-process via fastembed Rerank)
+  # base_url: ""
+  # model: "BAAI/bge-reranker-base-v2.0"
+  # Modal (serverless, deploy with: modal deploy modal/rerank_serve.py)
+  base_url: "https://anshujena007--prism-rerank-serve-serve.modal.run"
+  model: "BAAI/bge-reranker-base-v2.0"
+
+# Fireworks — primary LLM for API agent (GPT OSS 120B)
+fireworks:
+  base_url: "https://api.fireworks.ai/inference/v1"
+  model: "accounts/fireworks/models/gpt-oss-120b"
+
+neo4j:
+  uri: "bolt://localhost:7687"
+  user: "neo4j"
+  entity_extraction_model: "Qwen/Qwen2.5-14B-Instruct"
+  # entity_extraction_model: "accounts/fireworks/models/gpt-oss-120b"
+  community_report_model: "Qwen/Qwen2.5-14B-Instruct"
+  # community_report_model: "accounts/fireworks/models/gpt-oss-120b"
+  vector_index_name: "entity_embeddings"
+  vector_dimensions: 384
+  vector_similarity: "cosine"
+
+qdrant:
+  host: "localhost"
+  port: 6333
+  collection: "prism_filings"
+  dense_dim: 384
+
+models:
+  dense_embedding: "BAAI/bge-small-en-v1.5"
+  sparse_embedding: "prithvida/Splade_PP_en_v1"
+  reranker_model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+table:
+  images_dir: "data/processed/tables"
+  render_width: 1200
+
+services:
+  embedding_service_url: "http://localhost:8001"
+  reranker_service_url: "http://localhost:8002"
+  llm_endpoint: "https://api.fireworks.ai/inference/v1"
+
+langfuse:
+  host: "http://localhost:3000"
+
+aws:
+  region: "ap-south-1"
+  s3_docs_bucket: "prism-docs-local"
+  s3_snapshots_bucket: "prism-snapshots-local"
+
+ingestion:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  graph_dir: "data/graphs"
+  graph_batch_size: 8
+  graph_concurrency: 8
+  filings_glob: "*.htm"

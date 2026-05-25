@@ -59,6 +59,8 @@ class ParsedElement:
     anchor_id: str = "cover"
     # Additional metadata from unstructured extraction
     metadata: dict = field(default_factory=dict)
+    # Raw HTML for Table elements (used for image rendering)
+    raw_html: str = ""
 
 
 def _detect_section(text: str) -> tuple[str, str] | None:
@@ -84,6 +86,30 @@ def _detect_section(text: str) -> tuple[str, str] | None:
     return None
 
 
+def _extract_table_html_from_soup(soup: BeautifulSoup, text: str) -> str:
+    """Extract raw HTML table from BeautifulSoup for Table elements.
+    
+    Searches the soup for a table whose text content matches the element text.
+    Returns the outerHTML of the matched table.
+    
+    Args:
+        soup: Parsed BeautifulSoup object
+        text: Text content of the table element
+        
+    Returns:
+        Raw HTML string of the matched table, or empty string if not found
+    """
+    for table in soup.find_all("table"):
+        if text.strip() in table.get_text() or table.get_text().strip() in text:
+            return str(table)
+    for table in soup.find_all("table"):
+        if len(table.get_text().strip()) > 20:
+            sim = len(set(table.get_text().split()) & set(text.split())) / max(len(set(text.split())), 1)
+            if sim > 0.7:
+                return str(table)
+    return ""
+
+
 def parse_filing(cleaned_path: str | Path) -> list[ParsedElement]:
     """Parse cleaned HTML into typed elements with section information.
     
@@ -103,67 +129,46 @@ def parse_filing(cleaned_path: str | Path) -> list[ParsedElement]:
     """
     cleaned_path = Path(cleaned_path)
     
-    # ════════════════════════════════════════════════════════════════════
-    # Step 1: Partition HTML into typed elements
-    # ════════════════════════════════════════════════════════════════════
-    # unstructured library handles detection of Text, NarrativeText, Table,
-    # ListItem, Image based on HTML structure and CSS classes
     elements = partition_html(
         filename=str(cleaned_path),
-        skip_headers_and_footers=True,  # Ignore page headers/footers
+        skip_headers_and_footers=True,
         include_metadata=True,
     )
 
-    # Build TOC map for reference (may be used for anchor validation)
     with open(cleaned_path, "r", encoding="utf-8") as f:
         soup = BeautifulSoup(f, "lxml")
     _ = build_toc_map(soup)
 
-    # ════════════════════════════════════════════════════════════════════
-    # Step 2: Iterate through elements, annotate with section info
-    # ════════════════════════════════════════════════════════════════════
     parsed: list[ParsedElement] = []
-    current_anchor = "cover"      # Current section anchor ID
-    current_section = "Cover Page" # Current section display name
+    current_anchor = "cover"
+    current_section = "Cover Page"
 
     for el in elements:
-        # Get element type (Text, NarrativeText, Table, ListItem, Image)
         el_type = type(el).__name__
-        # Extract text content and strip whitespace
         text = str(el).strip()
 
-        # ════════════════════════════════════════════════════════════════
-        # Check if this element starts a new section
-        # ════════════════════════════════════════════════════════════════
         section_hit = _detect_section(text)
         if section_hit:
-            # Update current section anchor and label
             current_anchor, current_section = section_hit
-            # Skip short section headers themselves (they're just labels)
             if el_type == "Text" and len(text) < 80:
                 continue
 
-        # ════════════════════════════════════════════════════════════════
-        # Filter out boilerplate and low-value content
-        # ════════════════════════════════════════════════════════════════
-        # Uses should_skip() from cleaner module (checks length, pattern)
         if should_skip(text):
             continue
 
-        # ════════════════════════════════════════════════════════════════
-        # Skip image elements (no OCR/vision extraction yet)
-        # ════════════════════════════════════════════════════════════════
         if el_type == "Image":
             continue
 
-        # ════════════════════════════════════════════════════════════════
-        # Add element to parsed list with current section metadata
-        # ════════════════════════════════════════════════════════════════
+        raw_html = ""
+        if el_type == "Table":
+            raw_html = _extract_table_html_from_soup(soup, text)
+
         parsed.append(ParsedElement(
             text=text,
             element_type=el_type,
             section=current_section,
             anchor_id=current_anchor,
+            raw_html=raw_html,
         ))
 
     return parsed

@@ -27,6 +27,7 @@ Usage:
     # Returns: list[Chunk] with parent_text, table_markdown, company, ticker, etc.
 """
 
+import os
 import re
 import uuid
 from pathlib import Path
@@ -34,8 +35,26 @@ from dataclasses import dataclass, field
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import pandas as pd
 
+try:
+    import config as _config
+    _TABLE_IMAGES_DIR = getattr(_config, "TABLE_IMAGES_DIR", "data/processed/tables")
+except Exception:
+    _TABLE_IMAGES_DIR = "data/processed/tables"
+
 from ingestion.core.parser import ParsedElement, parse_filing
 from ingestion.core.metadata import parse_filename, build_source_url
+
+try:
+    from ingestion.core.table_renderer import render_table_to_image
+    TABLE_RENDERER_AVAILABLE = True
+except ImportError:
+    TABLE_RENDERER_AVAILABLE = False
+
+try:
+    from ingestion.core.vision_extractor import describe_table_image
+    VISION_EXTRACTOR_AVAILABLE = True
+except ImportError:
+    VISION_EXTRACTOR_AVAILABLE = False
 
 COVER_ANCHOR = "cover"
 
@@ -108,6 +127,8 @@ class Chunk:
     text: str
     parent_text: str = ""
     table_markdown: str = ""
+    table_image_path: str = ""
+    vision_description: str = ""
     company: str = ""
     ticker: str = ""
     cik: str = ""
@@ -293,17 +314,37 @@ def chunk_filing(cleaned_path: str | Path, raw_path: str | Path | None = None) -
         # ════════════════════════════════════════════════════════════════════
         # Process Tables Separately
         # ════════════════════════════════════════════════════════════════════
-        for tbl_el in table_texts:
-            # Convert HTML table to markdown if possible
+        for tbl_idx, tbl_el in enumerate(table_texts):
             tbl_md = _extract_table_markdown(tbl_el.text)
-            # Use markdown if available, otherwise use first 512 chars as summary
             tbl_summary = tbl_el.text[:512] if not tbl_md else tbl_md
 
             parent_id = str(uuid.uuid4())
+
+            table_image_path_val = ""
+            vision_description_val = ""
+
+            if TABLE_RENDERER_AVAILABLE and tbl_el.raw_html:
+                ticker = file_meta.get("ticker", "unknown")
+                year = file_meta.get("year", "unknown")
+                form = file_meta.get("filing_type", "unknown").replace("-", "")
+                section_slug = anchor_id if anchor_id else "unknown"
+                img_name = f"{ticker}_{year}_{form}_{section_slug}_table{tbl_idx+1}.png"
+                table_image_path_val = render_table_to_image(
+                    tbl_el.raw_html,
+                    _TABLE_IMAGES_DIR,
+                    img_name,
+                    width=1200,
+                )
+
+            if VISION_EXTRACTOR_AVAILABLE and table_image_path_val:
+                vision_description_val = describe_table_image(table_image_path_val)
+
             chunks.append(Chunk(
                 text=tbl_summary,
                 parent_text=tbl_el.text[:2000],
                 table_markdown=tbl_md,
+                table_image_path=table_image_path_val,
+                vision_description=vision_description_val,
                 company=_ticker_to_company(file_meta.get("ticker", "")),
                 ticker=file_meta.get("ticker", ""),
                 cik=file_meta.get("cik", ""),

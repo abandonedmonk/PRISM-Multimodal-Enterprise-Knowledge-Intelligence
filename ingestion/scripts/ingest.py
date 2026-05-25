@@ -1,32 +1,3 @@
-""" ╔════════════════════════════════════════════════════════════════════════════╗
-    ║  Qdrant Ingest Pipeline                                                    ║
-    ║  Embeds chunks with dense + sparse vectors, upserts to Qdrant vector DB.  ║
-    ╚════════════════════════════════════════════════════════════════════════════╝
-
-Purpose:
-    Convert JSONL chunks into dense + sparse vectors and ingest into Qdrant
-    vector database for hybrid search capabilities.
-
-Run:
-    # Ingest all JSONL files in data/processed/ into Qdrant
-    python -m ingestion.scripts.ingest
-    
-    # Recreate collection (delete old data)
-    python -m ingestion.scripts.ingest --recreate
-
-Configuration:
-    Source: config.yaml in project root (or uses defaults)
-    Default Dense Model: BAAI/bge-small-en-v1.5 (384 dims)
-    Default Sparse Model: prithvida/Splade_PP_en_v1
-    Qdrant Host: localhost:6333 (default)
-
-Models:
-    Dense Vectors:  384-dim semantic embeddings (cosine distance)
-    Sparse Vectors: BM25-style term frequency (IDF weighting)
-    
-    Hybrid approach enables both semantic and keyword search.
-"""
-
 import json
 import uuid
 from pathlib import Path
@@ -42,7 +13,8 @@ from qdrant_client.models import (
     PointStruct,
     SparseVector,
 )
-from fastembed import TextEmbedding, SparseTextEmbedding
+import httpx
+import config
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -50,30 +22,16 @@ if str(PROJECT_ROOT) not in sys.path:
 
 CONFIG_PATH = PROJECT_ROOT / "config.yaml"
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Configuration Management
-# ══════════════════════════════════════════════════════════════════════════════
 
 def load_config(path: str | Path = CONFIG_PATH) -> dict:
-    """Load Qdrant and model config from YAML file.
-    
-    Falls back to reasonable defaults if file doesn't exist.
-    
-    Args:
-        path: Path to config.yaml (default: project root)
-        
-    Returns:
-        Config dict with qdrant connection and model settings
-    """
     path = Path(path)
     if not path.exists():
-        # Return sensible defaults
         return {
             "qdrant": {
-                "host": "localhost",
-                "port": 6333,
-                "collection": "prism_filings",
-                "dense_dim": 384,
+                "host": config.QDRANT_HOST,
+                "port": config.QDRANT_PORT,
+                "collection": config.QDRANT_COLLECTION,
+                "dense_dim": config.NEO4J_VECTOR_DIMENSIONS,
             },
             "models": {
                 "dense_embedding": "BAAI/bge-small-en-v1.5",
@@ -85,40 +43,22 @@ def load_config(path: str | Path = CONFIG_PATH) -> dict:
         return yaml.safe_load(f)
 
 
-def get_client(config: dict | None = None) -> QdrantClient:
-    """Create Qdrant client from config.
-    
-    Args:
-        config: Config dict (loads from file if None)
-        
-    Returns:
-        Qdrant client instance
-    """
-    if config is None:
-        config = load_config()
-    return QdrantClient(config["qdrant"]["host"], port=config["qdrant"]["port"])
+def get_client(cfg: dict | None = None) -> QdrantClient:
+    if cfg is None:
+        cfg = load_config()
+    return QdrantClient(cfg["qdrant"]["host"], port=cfg["qdrant"]["port"])
 
 
-def create_collection(client: QdrantClient, config: dict | None = None) -> None:
-    """Create or recreate collection with dense + sparse vectors.
-    
-    Deletes existing collection if present, then creates new one.
-    
-    Args:
-        client: Qdrant client
-        config: Config dict (loads from file if None)
-    """
-    if config is None:
-        config = load_config()
-    col = config["qdrant"]["collection"]
-    dim = config["qdrant"]["dense_dim"]
+def create_collection(client: QdrantClient, cfg: dict | None = None) -> None:
+    if cfg is None:
+        cfg = load_config()
+    col = cfg["qdrant"]["collection"]
+    dim = cfg["qdrant"]["dense_dim"]
 
-    # Delete existing collection
     existing = [c.name for c in client.get_collections().collections]
     if col in existing:
         client.delete_collection(col)
 
-    # Create collection with dense + sparse vectors
     client.create_collection(
         collection_name=col,
         vectors_config={
@@ -130,56 +70,75 @@ def create_collection(client: QdrantClient, config: dict | None = None) -> None:
     )
 
 
-def _load_dense_model(config: dict) -> TextEmbedding:
-    """Load dense embedding model (semantic embeddings).
-    
-    Args:
-        config: Config dict
-        
-    Returns:
-        TextEmbedding model instance
-    """
-    return TextEmbedding(config["models"]["dense_embedding"])
+def _embed_dense_remote(texts: list[str], base_url: str, model: str, batch_size: int = 64) -> list[list[float]]:
+    results = []
+    with httpx.Client(timeout=300.0, follow_redirects=True) as client:
+        for start in range(0, len(texts), batch_size):
+            batch = texts[start:start + batch_size]
+            resp = client.post(
+                f"{base_url.rstrip('/')}/v1/embeddings",
+                json={"input": batch, "model": model},
+            )
+            resp.raise_for_status()
+            data = resp.json()["data"]
+            data.sort(key=lambda d: d["index"])
+            for item in data:
+                results.append(item["embedding"])
+    return results
 
 
-def _load_sparse_model(config: dict) -> SparseTextEmbedding:
-    """Load sparse embedding model (term frequency).
-    
-    Args:
-        config: Config dict
-        
-    Returns:
-        SparseTextEmbedding model instance
-    """
-    return SparseTextEmbedding(config["models"]["sparse_embedding"])
+def _embed_sparse_remote(texts: list[str], base_url: str, batch_size: int = 64) -> list[dict]:
+    results = []
+    with httpx.Client(timeout=300.0, follow_redirects=True) as client:
+        for start in range(0, len(texts), batch_size):
+            batch = texts[start:start + batch_size]
+            resp = client.post(
+                f"{base_url.rstrip('/')}/v1/sparse_embeddings",
+                json={"input": batch},
+            )
+            resp.raise_for_status()
+            data = resp.json()["data"]
+            data.sort(key=lambda d: d["index"])
+            for item in data:
+                results.append({
+                    "indices": item["indices"],
+                    "values": item["values"],
+                })
+    return results
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Embedding and Ingestion
-# ══════════════════════════════════════════════════════════════════════════════
+def _load_dense_model(cfg: dict):
+    base_url = getattr(config, "EMBEDDING_BASE_URL", "") or ""
+    if base_url:
+        return "remote", base_url, cfg["models"]["dense_embedding"]
+    from fastembed import TextEmbedding
+    return "local", TextEmbedding(cfg["models"]["dense_embedding"]), None
+
+
+def _load_sparse_model(cfg: dict):
+    base_url = getattr(config, "EMBEDDING_BASE_URL", "") or ""
+    if base_url:
+        return "remote", base_url
+    from fastembed import SparseTextEmbedding
+    return "local", SparseTextEmbedding(cfg["models"]["sparse_embedding"])
+
 
 def embed_chunks(
     chunks: list[dict],
-    dense_model: TextEmbedding,
-    sparse_model: SparseTextEmbedding,
+    dense_model,
+    sparse_model,
     batch_size: int = 64,
 ) -> list[PointStruct]:
-    """Convert chunks to dense + sparse vectors as Qdrant PointStruct.
-    
-    Args:
-        chunks: List of chunk dicts from JSONL
-        dense_model: Dense embedding model
-        sparse_model: Sparse embedding model
-        batch_size: Batch size for embedding (default 64)
-        
-    Returns:
-        List of PointStruct objects ready for Qdrant upsert
-    """
-    texts = [c["text"] for c in chunks]
+    texts = []
+    for c in chunks:
+        if c.get("element_type") == "Table" and c.get("vision_description"):
+            tbl_md = c.get("table_markdown", "")
+            texts.append(f"{c['vision_description']}\n\n{tbl_md}")
+        else:
+            texts.append(c["text"])
     points = []
     total = len(texts)
 
-    # Batch embedding for efficiency
     for start in range(0, total, batch_size):
         end = min(start + batch_size, total)
         batch_texts = texts[start:end]
@@ -187,16 +146,35 @@ def embed_chunks(
 
         print(f"  Embedding {start+1}-{end}/{total}...")
 
-        # Generate dense and sparse vectors
-        dense_vecs = list(dense_model.embed(batch_texts))
-        sparse_vecs = list(sparse_model.embed(batch_texts))
+        if dense_model[0] == "remote":
+            _, base_url, model_name = dense_model
+            dense_vecs = _embed_dense_remote(batch_texts, base_url, model_name, batch_size=batch_size)
+        else:
+            _, local_model, _ = dense_model
+            dense_vecs = [v.tolist() for v in local_model.embed(batch_texts)]
 
-        # Create PointStruct for each chunk
+        if sparse_model[0] == "remote":
+            _, base_url = sparse_model
+            sparse_vecs = _embed_sparse_remote(batch_texts, base_url, batch_size=batch_size)
+        else:
+            _, local_sparse = sparse_model
+            sparse_vecs = list(local_sparse.embed(batch_texts))
+
         for i, chunk in enumerate(batch_chunks):
-            dv = dense_vecs[i].tolist()
-            sv = sparse_vecs[i]
+            dv = dense_vecs[i] if isinstance(dense_vecs[i], list) else dense_vecs[i]
 
-            # Prepare payload (all chunk metadata except chunk_id)
+            if isinstance(sparse_vecs[i], dict):
+                sv_indices = sparse_vecs[i]["indices"]
+                sv_values = sparse_vecs[i]["values"]
+            else:
+                sv_indices = sparse_vecs[i].indices.tolist()
+                sv_values = sparse_vecs[i].values.tolist()
+
+            embed_text = chunk.get("text", "")
+            if chunk.get("element_type") == "Table" and chunk.get("vision_description"):
+                tbl_md = chunk.get("table_markdown", "")
+                embed_text = f"{chunk['vision_description']}\n\n{tbl_md}"
+
             payload = {k: v for k, v in chunk.items() if k not in ("chunk_id",)}
             for key, val in payload.items():
                 if isinstance(val, Path):
@@ -208,8 +186,8 @@ def embed_chunks(
                     vector={
                         "dense": dv,
                         "sparse": SparseVector(
-                            indices=sv.indices.tolist(),
-                            values=sv.values.tolist(),
+                            indices=sv_indices,
+                            values=sv_values,
                         ),
                     },
                     payload=payload,
@@ -222,46 +200,27 @@ def embed_chunks(
 def upsert_points(
     client: QdrantClient,
     points: list[PointStruct],
-    config: dict | None = None,
-    batch_size: int = 100,
+    cfg: dict | None = None,
+    batch_size: int = 200,
 ) -> None:
-    """Upsert points into Qdrant collection in batches.
-    
-    Args:
-        client: Qdrant client
-        points: List of PointStruct to upsert
-        config: Config dict (loads from file if None)
-        batch_size: Batch size for upsert (default 100)
-    """
-    if config is None:
-        config = load_config()
-    col = config["qdrant"]["collection"]
+    if cfg is None:
+        cfg = load_config()
+    col = cfg["qdrant"]["collection"]
 
-    # Batch upsert for efficiency
     for start in range(0, len(points), batch_size):
         batch = points[start : start + batch_size]
         client.upsert(collection_name=col, points=batch)
         print(f"  Upserted {start+1}-{min(start+batch_size, len(points))}/{len(points)}")
 
 
-def ingest_jsonl(jsonl_path: str | Path, config: dict | None = None) -> int:
-    """Ingest a single JSONL file of chunks into Qdrant.
-    
-    Args:
-        jsonl_path: Path to _chunks.jsonl file
-        config: Config dict (loads from file if None)
-        
-    Returns:
-        Number of points ingested
-    """
-    if config is None:
-        config = load_config()
+def ingest_jsonl(jsonl_path: str | Path, cfg: dict | None = None) -> int:
+    if cfg is None:
+        cfg = load_config()
 
-    client = get_client(config)
-    dense_model = _load_dense_model(config)
-    sparse_model = _load_sparse_model(config)
+    client = get_client(cfg)
+    dense_model = _load_dense_model(cfg)
+    sparse_model = _load_sparse_model(cfg)
 
-    # Load chunks from JSONL
     chunks = []
     with open(jsonl_path, encoding="utf-8") as f:
         for line in f:
@@ -274,35 +233,63 @@ def ingest_jsonl(jsonl_path: str | Path, config: dict | None = None) -> int:
         return 0
 
     print(f"  {Path(jsonl_path).name}: {len(chunks)} chunks")
-    # Embed and upsert
     points = embed_chunks(chunks, dense_model, sparse_model)
-    upsert_points(client, points, config)
+    upsert_points(client, points, cfg)
     return len(points)
 
 
+def _get_ingested_signatures(client: QdrantClient, cfg: dict) -> set[str]:
+    col = cfg["qdrant"]["collection"]
+    signatures = set()
+    offset = None
+    while True:
+        results, offset = client.scroll(col, limit=500, offset=offset, with_payload=True)
+        if not results:
+            break
+        for r in results:
+            p = r.payload
+            sig = f"{p.get('ticker','')}_{p.get('filing_type','')}_{p.get('year','')}_{p.get('quarter','')}"
+            signatures.add(sig)
+        if offset is None:
+            break
+    return signatures
+
+
+def _file_to_signature(filepath: Path) -> str:
+    stem = filepath.stem.replace("_chunks", "").replace("_clean", "")
+    parts = stem.split("_")
+    ticker = parts[0] if parts else ""
+    filing_type = ""
+    year = ""
+    quarter = ""
+    for p in parts[1:]:
+        if p in ("10K", "10-K"):
+            filing_type = "10-K"
+        elif p in ("10Q", "10-Q"):
+            filing_type = "10-Q"
+        elif len(p) == 4 and p.isdigit():
+            year = p
+        elif p.startswith("Q") and len(p) == 2 and p[1].isdigit():
+            quarter = p[1]
+    return f"{ticker}_{filing_type}_{year}_{quarter}"
+
+
 def ingest_all(
-    processed_dir: str | Path = "data/processed",
-    config_path: str | Path = CONFIG_PATH,
     recreate: bool = False,
+    resume: bool = False,
 ) -> int:
-    """Ingest all JSONL files from processed directory into Qdrant.
-    
-    Args:
-        processed_dir: Directory with *_chunks.jsonl files
-        config_path: Path to config.yaml
-        recreate: If True, delete and recreate collection
-        
-    Returns:
-        Total number of points ingested
-    """
-    config = load_config(config_path)
-    client = get_client(config)
+    cfg = load_config()
+    client = get_client(cfg)
 
-    # Optionally recreate collection (clears old data)
     if recreate:
-        create_collection(client, config)
+        create_collection(client, cfg)
 
-    processed_dir = Path(processed_dir)
+    ingested_sigs = set()
+    if resume and not recreate:
+        ingested_sigs = _get_ingested_signatures(client, cfg)
+        print(f"Resume mode: {len(ingested_sigs)} filings already in Qdrant")
+
+    processed_dir = PROJECT_ROOT / config.INGESTION_PROCESSED_DIR
     if not processed_dir.exists():
         print(f"Directory {processed_dir} not found")
         return 0
@@ -313,13 +300,17 @@ def ingest_all(
         print("No *_chunks.jsonl files found")
         return 0
 
-    print(f"Ingesting {len(jsonl_files)} filing(s) into '{config['qdrant']['collection']}'...\n")
+    print(f"Ingesting {len(jsonl_files)} filing(s) into '{cfg['qdrant']['collection']}'...\n")
 
-    # Reuse models for all files (more efficient)
-    dense_model = _load_dense_model(config)
-    sparse_model = _load_sparse_model(config)
+    dense_model = _load_dense_model(cfg)
+    sparse_model = _load_sparse_model(cfg)
 
     for jsonl_file in jsonl_files:
+        sig = _file_to_signature(jsonl_file)
+        if sig in ingested_sigs:
+            print(f"Skipping {jsonl_file.name} (already ingested)")
+            continue
+
         chunks = []
         with open(jsonl_file, encoding="utf-8") as f:
             for line in f:
@@ -332,11 +323,11 @@ def ingest_all(
 
         print(f"Processing {jsonl_file.name}: {len(chunks)} chunks")
         points = embed_chunks(chunks, dense_model, sparse_model)
-        upsert_points(client, points, config)
+        upsert_points(client, points, cfg)
         total += len(points)
         print()
 
-    print(f"Done. {total} points ingested into '{config['qdrant']['collection']}'.")
+    print(f"Done. {total} points ingested into '{cfg['qdrant']['collection']}'.")
     return total
 
 
@@ -344,13 +335,8 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Ingest chunk JSONL files into Qdrant")
-    parser.add_argument("--processed-dir", default="data/processed")
-    parser.add_argument("--config", default=str(CONFIG_PATH))
     parser.add_argument("--recreate", action="store_true", help="Delete and recreate collection")
-    parser.add_argument("--file", type=str, help="Ingest a single JSONL file instead of all")
+    parser.add_argument("--resume", action="store_true", help="Skip filings already in Qdrant")
     args = parser.parse_args()
 
-    if args.file:
-        count = ingest_jsonl(args.file, load_config(args.config))
-    else:
-        count = ingest_all(args.processed_dir, args.config, args.recreate)
+    ingest_all(recreate=args.recreate, resume=args.resume)

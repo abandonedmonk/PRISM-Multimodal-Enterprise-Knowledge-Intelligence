@@ -1,0 +1,1 @@
+from config import *  # re-export for backward compatibility

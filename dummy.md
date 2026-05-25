@@ -1,0 +1,29 @@
+2. PRISM — Multimodal Enterprise Knowledge Intelligence (SEC Filing Q&A)
+[Date: Jan'26 - May'26]
+[GitHub URL: https://github.com/abandonedmonk/PRISM-Multimodal-Enterprise-Knowledge-Intelligence]
+[Tech Stack: Python, FastAPI, LangGraph, Modal (serverless), vLLM, Qdrant, Neo4j, Playwright, OpenAI API, RAGAS, Docker/docker-compose, Kubernetes, Terraform, AWS/EKS]
+[Keywords: GraphRAG, hybrid retrieval, SEC filings, multimodal AI, vector DB, graph search, entity extraction, community detection, LLM serving, RAG, question-answering, automated evaluation, benchmarking, enterprise NLP, knowledge graphs, production ML]
+- Engineered a multimodal enterprise knowledge system processing SEC filings through a tiered architecture—chunked documents hierarchically (parent \textbf{3500} tokens / child \textbf{1024} tokens), indexed across Qdrant (dense + sparse vectors) and Neo4j (entity graph + community detection via Louvain)—reducing retrieval latency to \textbf{333ms median} (p95: 505ms) while enabling hybrid retrieval with measurable source attribution.
+- Deployed serverless LLM infrastructure scaling from local GPU (vLLM, ≥40GB VRAM) to Modal cloud, serving Qwen 14B, Llama Vision 11B, and BGE embeddings, achieving end-to-end query latency of \textbf{2.96s median} (p95: 10s) across \textbf{50} diverse question types (multi-hop, temporal, qualitative, false-premise), demonstrating production-ready performance for enterprise Q&A workloads.
+- Built and validated an automated evaluation pipeline using RAGAS faithfulness scoring over \textbf{50} queries grouped by ticker/domain/filing, identifying a baseline faithfulness of \textbf{45.8\%} and establishing repeatable benchmarks to guide iterative improvements in retrieval filtering, reranking, and prompt engineering.
+
+### What the repo actually contains
+A complete enterprise knowledge-intelligence stack for SEC filing ingestion and contextualized Q&A. It includes end-to-end ingestion (HTML/XBRL cleaning, chunking, table vision enrichment), dual indexing (Qdrant for vector search, Neo4j for graph queries), LangGraph agent orchestration with intelligent tool routing, FastAPI REST serving, Modal serverless deployment, local vLLM fallback, and an automated evaluation harness with benchmark tracking.
+
+### Core architecture
+- `ingestion/` downloads SEC filings, cleans boilerplate/markup, partitions HTML into typed elements, applies hierarchical chunking, renders tables to PNG via Playwright, extracts entities with Qwen 14B, and upserts vectors (dense: BGE-small, sparse: Splade) into Qdrant; also builds Neo4j graph via entity merging and community detection.
+- `retrieval/` implements hybrid retrieval: Qdrant vector search (top-k dense) merged with Neo4j local/global graph traversal and cross-encoder reranking, scoring by relevance and source overlap.
+- `agents/orchestrator.py` (LangGraph) routes queries to retrieval tools, dispatches to web/vision tools as needed, assembles context, and calls LLM (Qwen 14B via Modal or local vLLM) for generation while maintaining conversation state.
+- `modal/` serves LLM, vision, embedding, and reranking models on AWS A100/A10 GPUs or CPU, with warm startup via `modal invoke` and production deployment via `modal deploy`.
+- `api/main.py` exposes `/chat`, `/documents`, and `/voice` endpoints with FastAPI, managing request/response flow, error handling, and source attribution.
+- `eval/` contains a **50**-query test set grouped by ticker/domain/question-type/filing, runs evaluations with configurable retrieval modes and generator models, logs latency/faithfulness, and generates JSON reports for benchmarking.
+
+### Repo-backed implementation details
+The ingestion pipeline (HTML parsing, chunking hierarchy, Playwright PNG rendering, entity extraction, graph building) runs checkpointed via JSONL to enable pause/resume. Neo4j uses community detection via GDS Louvain for cohort extraction. LangGraph manages state as a TypedDict, enabling multi-turn conversation and tool tracing. Modal deployment uses `@web_endpoint` decorators and Docker layers to optimize warm-start latency. Qdrant uses both dense (BGE-small) and sparse (Splade) vectors for complementary search signals. Evaluation captures p50/p95 latencies and per-query faithfulness via RAGAS judge model, enabling grouped analysis by business domain.
+
+### Resume-safe metrics
+Use \textbf{50} evaluation queries, \textbf{333ms} median retrieval latency (p95: 505ms), \textbf{2.96s} median end-to-end latency (p95: 10s), \textbf{45.8\%} baseline faithfulness, \textbf{3} retrieval modes (hybrid/graph_local/graph_global), \textbf{3500}/\textbf{1024} token hierarchical chunking, \textbf{29} Terraform-managed infra resources, \textbf{10} tickers (AAPL, AMD, AMZN, GOOGL, META, MSFT, NVDA, TSLA, INTC, JPM), \textbf{5} question types (Direct, Multi_Hop, Temporal_Comparison, Qualitative, False_Premise), \textbf{2} serving options (Modal serverless + local vLLM), and \textbf{3} core components (ingestion, retrieval, agent). All documented in README, QUICKSTART.sh, and eval outputs.
+
+### ATS keywords
+GraphRAG, hybrid retrieval, SEC filings, multimodal AI, Qdrant, Neo4j, GDS (Graph Data Science), entity extraction, community detection, Louvain algorithm, vector databases, sparse retrieval, Splade, fastembed, LangGraph, FastAPI, Modal, vLLM, Qwen, Llama Vision, BGE embeddings, Playwright, Python, Pydantic, OpenAI API, Groq, Fireworks, RAGAS evaluation, prompt engineering, RAG (Retrieval-Augmented Generation), question-answering systems, knowledge graphs, LLM serving, API development, Docker/docker-compose, Kubernetes, Terraform, infrastructure as code, automated benchmarking, evaluation pipelines, latency profiling, data drift monitoring, production ML, enterprise NLP, information retrieval, pytest, pandas, JSONL, XBRL, HTML parsing.
+
